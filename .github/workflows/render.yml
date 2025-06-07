@@ -7,7 +7,9 @@ on:
 
 jobs:
   render-samples:
-    runs-on: 123marvin123/typst
+    runs-on: ubuntu-latest
+    container:
+      image: 123marvin123/typst
 
     steps:
       # Check out the repo
