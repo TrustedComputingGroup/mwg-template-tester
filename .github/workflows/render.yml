@@ -1,0 +1,29 @@
+name: pull_request
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  render-samples:
+    runs-on: 123marvin123/typst
+
+    steps:
+      # Check out the repo
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Render the samples
+      - name: render
+        run: ./build.sh
+        shell: sh
+
+      # Upload the artifacts
+      - name: upkload
+        uses: actions/upload-artifact@v4
+        with:
+          name: samples
+          path: *.pdf
