@@ -36,13 +36,13 @@ provide sufficient clarity, the following rules apply:
 1. A statement with a capitalized RFC key word ("MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD,"
   "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL") as in RFC 8174 is always normative.
 
-2. Text that is delimited by horizontal rules and labeled as an informative statement, note, example, etc. is always informative.
+2. Text that is delimited by horizontal rules and labeled as an informative statement, note, example, etc. is always informative. For example:
 
-#informative(
-  kind: "Note",
-  [Reach out to #link("mailto:admin@trustedcomputinggroup.org") with any questions about this document.
-  ],
-)
+  #informative(
+    kind: "Note",
+    [Reach out to #link("mailto:admin@trustedcomputinggroup.org") with any questions about this document.
+    ],
+  )
 
 #pagebreak()
 
@@ -65,9 +65,9 @@ Consecteturs that form part of a computer network or enterprise environment.
 
 Air-gapped consecteturs, non-consectutor amets.
 
-== Trusted Computing Group
+== Consectetur Attestation
 
-Trusted Computing Group (TCG)'s logo is depicted in the below figure:
+Consectetur Attestation is depicted in the below figure:
 
 #figure(
   image("architecture.drawio.png", width: 60%),
