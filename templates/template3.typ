@@ -58,7 +58,7 @@
   // Normal text
   set text(
     font: "Alegreya Sans",
-    size: 10pt,
+    size: 10.5pt,
   )
   // Math
   show math.equation: set text(
@@ -171,7 +171,7 @@
 
   set align(left + top)
 
-  set text(font: "Alegreya Sans", size: 10pt)
+  set text(font: "Alegreya Sans", size: 10.5pt)
 
   doc
 }
