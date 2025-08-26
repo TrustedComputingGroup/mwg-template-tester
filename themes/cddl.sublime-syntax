@@ -1,0 +1,239 @@
+%YAML 1.2
+# This is the Sublime syntax definition for the Concise data definition language
+# (CDDL), a notational convention to express CBOR and JSON data structures.
+#
+# More information: https://datatracker.ietf.org/doc/draft-ietf-cbor-cddl/
+#
+# LICENSE: BSD-3-Clause
+#
+# Copyright (c) 2019 Fabian Neumann. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright notice,
+#        this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of its
+#        contributors may be used to endorse or promote products derived from
+#        this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+---
+name: CDDL
+file_extensions:
+  - cddl
+scope: source.cddl
+
+variables:
+  id: |-
+    (?x)(?:
+      [$@A-Z_a-z]
+      (?:[\-\.]*
+         [$@0-9A-Z_a-z]
+         |
+         [$@0-9A-Z_a-z]
+      )*)
+  # While the spec reads more like "an int must not start with 0" we use a
+  # lookahead here that says "after a 0 there must be no digit". This makes the
+  # '0' the invalid character in '01', which looks nicer when highlighted.
+  uint:  '(?:0b[01]+|0x[0-9a-fA-F]+|[1-9]\d*|0(?!\d))'
+  int: '-?(?:0b[01]+|0x[0-9a-fA-F]+|[1-9]\d*|0(?!\d))'
+
+contexts:
+  prototype:
+    - include: comments
+  main:
+    - include: tags
+    - include: operators
+    - include: punctuation
+    - include: controls
+    - include: bstrb64url
+    - include: bstrh
+    - include: bstr
+    - include: strings
+    - include: barewords
+    - include: names
+    - include: values
+    - match: '\s'
+      scope: whitespace
+    - match: '.'
+      scope: invalid.illegal.cddl
+
+  tags:
+    - match: '#\d(\.{{uint}}|)'
+      scope: support.type.cddl
+    - match: '#(\d\.{{uint}}|)'
+      scope: support.type.cddl
+
+  controls:
+    - match: '\.(and|bits|cbor|cborseq|default|eq|ge|gt|le|lt|ne|regexp|size|within)'
+      scope: keyword.control.cddl
+
+  operators:
+    # occurrence
+    - match: '\?|\+'
+      scope: keyword.operator
+    - match: '({{uint}})?(\*)({{uint}})?'
+      captures:
+        1: constant.numeric.cddl
+        2: keyword.operator
+        3: constant.numeric.cddl
+    # cuts
+    - match: '\^'
+      scope: keyword.operator
+    # range
+    - match: '\.\.\.|\.\.'
+      scope: keyword.operator
+    # into choice
+    - match: '&(?=\s*({{id}}|\())'
+      scope: keyword.operator
+    # unwrap op
+    - match: '~(?=\s*{{id}})'
+      scope: keyword.operator
+    - match: '//|/(?!/)'
+      scope: keyword.operator
+    - match: '=>'
+      scope: keyword.operator
+    - match: '/==|/=|='
+      scope: keyword.operator
+
+  punctuation:
+    - match: '[\[\]{}\(\),<>:]'
+      scope: punctuation
+
+  barewords:
+    # Barewords as member keys (must be matched before values, types, typenames,
+    # groupnames). Scope is string as barewords are always interpreted as such.
+    - match: '{{id}}(?=\s*:)'
+      scope: string.other
+
+  builtin-types:
+    - match: |-
+        (?x)\b(
+          cbor-any|any|
+          b64legacy|b64url|bigfloat|bigint|bignint|biguint|bool|
+          bstr|bytes|decfrac|eb16|eb64legacy|eb64url|encoded-cbor|false|
+          float16-32|float32-64|float16|float32|float64|float|
+          uint|integer|int|
+          mime-message|nil|nint|null|number|regexp|tdate|text|
+          time|true|tstr|undefined|unsigned|uri
+        )\b
+        (?![\-@$])  # if followed by one of those it's part of a user-defined name
+      scope: support.type.cddl
+
+  names:
+    # extension points
+    - match: '(\$\$?){{id}}'
+      scope: variable.other
+      captures:
+        1: punctuation.definition.variable.cddl
+    - match: '(?={{id}})'
+      push:
+        # types
+        - include: builtin-types
+        # user-defined names
+        - match: '\b{{id}}\b'
+          scope: meta.generic-name.cddl
+        - match: ''
+          pop: true
+
+  values:
+    - match: '(0b)[01]+'
+      scope: constant.numeric.integer.binary.cddl
+      captures:
+        1: punctuation.definition.numeric.binary.cddl
+    - match: '(0o)[0-7]+'
+      scope: constant.numeric.integer.octal.cddl
+      captures:
+        1: punctuation.definition.numeric.octal.cddl
+    - match: '(0x)[0-9a-fA-F]+(\.[0-9a-fA-F]+|)p[+-]?\d+' # hexfloat
+      scope: constant.numeric.integer.hexadecimal.cddl
+      captures:
+        1: punctuation.definition.numeric.hexadecimal.cddl
+        3: invalid
+    - match: '(0x)[0-9a-fA-F]+' # hex
+      scope: constant.numeric.integer.hexadecimal.cddl
+      captures:
+        1: punctuation.definition.numeric.hexadecimal.cddl
+    - match: '{{int}}(?:\.\d+)?(?:e[+-]?\d+)?' # int or float
+      scope: constant.numeric.cddl
+
+  bstrb64url:
+    - match: "(b64)(')"
+      captures:
+        1: storage.type.string.cddl
+        2: punctuation.definition.string.begin.cddl
+      scope: punctuation.definition.string.begin.cddl
+      push: inside_bstrb64url
+  inside_bstrb64url:
+    - meta_scope: string.quoted.single.cddl
+    - match: '\\.'
+      scope: constant.character.escape.cddl
+    - match: "'"
+      scope: punctuation.definition.string.end.cddl
+      pop: true
+    - match: '[^\s0-9a-zA-Z\-_=]+'
+      scope: invalid.illegal
+
+  bstrh:
+    - match: "(h)(')"
+      captures:
+        1: storage.type.string.cddl
+        2: punctuation.definition.string.begin.cddl
+      scope: punctuation.definition.string.begin.cddl
+      push: inside_bstrh
+  inside_bstrh:
+    - meta_scope: string.quoted.single.cddl
+    - match: '\\.'
+      scope: constant.character.escape.cddl
+    - match: "'"
+      scope: punctuation.definition.string.end.cddl
+      pop: true
+    - match: '[^\s0-9a-fA-F]+'
+      scope: invalid.illegal
+
+  bstr:
+    - match: "'"
+      scope: punctuation.definition.string.begin.cddl
+      push: inside_bstr
+  inside_bstr:
+    - meta_include_prototype: false # no comments in here
+    - meta_scope: string.quoted.single.cddl
+    - match: '\\.'
+      scope: constant.character.escape.cddl
+    - match: "'"
+      scope: punctuation.definition.string.end.cddl
+      pop: true
+
+  strings:
+    - match: '"'
+      scope: punctuation.definition.string.begin.cddl
+      push: inside_string
+  inside_string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.cddl
+    - match: '\.'
+      scope: constant.character.escape.cddl
+    - match: '"'
+      scope: punctuation.definition.string.end.cddl
+      pop: true
+
+  comments:
+    - match: ';'
+      scope: punctuation.definition.comment.cddl
+      push:
+        - meta_scope: comment.line.cddl
+        - match: $\n?
+          pop: true
