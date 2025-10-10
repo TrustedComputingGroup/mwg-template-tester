@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------- */
 /* TCG Typst Template                                                         */
-/* Version: 0.2.7                                                             */
-/* Filename: 'tcg-typst-template-v0.2.7-alpha.tpl.typ'                        */
+/* Version: 0.2.8                                                             */
+/* Filename: 'tcg-typst-template-v0.2.8-alpha.tpl.typ'                        */
 /* Authors:                                                                   */
 /*   * John Doe (john.doe@example.com)                                        */
 /*   * Jane Doe (jane.doe@acme.org)                                           */
@@ -22,6 +22,7 @@
 #let font-text-size = 10.5pt
 #let font-mono-face = "Fira Code"
 #let font-mono-size = (font-text-size * 0.95)
+// #let font-mono-size = (font-text-size * 1.0)
 // #let font-mono-size = (font-text-size * 0.89)
 // #let font-mono-size = 10.5pt
 #let font-math-face = "STIX Two Math"
@@ -42,7 +43,6 @@
 #let tcg-color-orange = rgb("#f8941eff")
 #let tcg-color-blue = rgb("#283578ff")
 #let tcg-color-light-blue = rgb("#3e75c4ff")
-#let tcg-color-light-blue = rgb("#242537ff")
 #let tcg-color-light-green = rgb("#8dc73fff")
 
 /* element colors */
@@ -55,32 +55,100 @@
 #let color-doctype-default = tcg-color-orange
 #let color-doctype-specification = tcg-color-blue
 #let color-doctype-reference = tcg-color-light-green
-#let color-doctype-guidance = tcg-color-light-green
+#let color-doctype-guidance = tcg-color-orange
+
+
+
+/* --- variables ------------------------------------------------------------ */
+
+#let tcg-label-table-of-contents = "Contents"
+#let tcg-label-list-of-figures = "Figures"
+#let tcg-label-list-of-tables = "Tables"
+#let tcg-label-list-of-listings = "Listings"
+#let tcg-label-list-of-equations = "Equations"
+
+#let tcg-toc-depth = 3
 
 
 
 /* --- definitions ---------------------------------------------------------- */
 
-#let table-toprule = table.hline(stroke: 0.08em)
-#let table-bottomrule = table-toprule
-#let table-midrule = table.hline(stroke: 0.05em)
+#let table-top-rule = table.hline(stroke: 0.08em)
+#let table-bottom-rule = table-top-rule
+#let table-middle-rule = table.hline(stroke: 0.05em)
+#let table-add-line-space = table.hline(stroke: (thickness: 0.5em, paint: rgb(0, 0, 0, 0)))
 
 #let table-header-text(body) = text(body, weight: "semibold", font: font-head-face)
 
+// Abbreviations
+#let tsp = [$thin$]
+#let __ = tsp
+#let eg = [e.#{ tsp }g.]
+#let ie = [i.#{ tsp }e.]
+#let ia = [i.#{ tsp }a.]
+#let cf = [cf.]
 
 
 /* --- functions ------------------------------------------------------------ */
 
 /* appendix */
 #let appendix(body) = {
-  set heading(numbering: "A.1", supplement: [Anhang])
+  set heading(numbering: "A.1.", supplement: [Appendix])
   counter(heading).update(0)
   body
 }
 
 /* horizontal rule */
-#let horizontalrule = line(start: (25%, 0%), end: (75%, 0%))
+#let horizontal-rule = line(
+  start: (25%, 0%),
+  end: (75%, 0%),
+  stroke: (thickness: 0.1em, cap: "round"),
+)
 
+#let tcg-toc() = context {
+  show outline.entry.where(level: 1): set block(above: 1.2em)
+  show outline.entry.where(level: 1): set text(size: 1.2em, font: font-head-face, weight: "bold")
+  show outline.entry.where(level: 1): it => {
+    show repeat: none
+    it
+  }
+  outline(
+    title: tcg-label-table-of-contents,
+    depth: tcg-toc-depth,
+  )
+}
+
+#let tcg-lof() = context {
+  outline(
+    title: tcg-label-list-of-figures,
+    target: figure.where(kind: image),
+    depth: tcg-toc-depth,
+  )
+}
+
+#let tcg-lot() = context {
+  outline(
+    title: tcg-label-list-of-tables,
+    target: figure.where(kind: table),
+    depth: tcg-toc-depth,
+  )
+}
+
+#let tcg-lol() = context {
+  outline(
+    title: tcg-label-list-of-listings,
+    target: figure.where(kind: raw),
+    depth: tcg-toc-depth,
+  )
+}
+
+#let tcg-loe() = context {
+  outline(
+    title: tcg-label-list-of-equations,
+    target: figure.where(kind: math.equation),
+    depth: tcg-toc-depth,
+  )
+}
 
 /**
  * @brief Creates a captioned rule suitable for captioning, especially for titlepages.
@@ -433,8 +501,10 @@
           stroke: 1.5pt,
           box-radius: 1em,
           box-inset: 0.3em,
-          box-align: left,
+          // box-align: left,
+          box-align: right,
           box-left-margin: 1em,
+          box-right-margin: 1em,
           invert-curve-direction: true,
         )
       ],
@@ -511,6 +581,8 @@
   }
 }
 
+#let informative = informative-eckelmeckel-02
+
 #let tcg-doc(
   title: "The Coolest and Most Awesome TCG Document Ever Made",
   subtitle: "A TCG Specification",
@@ -519,10 +591,11 @@
   version: "Version 184, Revision 0.37",
   date: "April 15, 2003",
   year: none,
+  has-appendix: false,
   doc,
 ) = context {
   /* --- font settings ------------------------------------------------------ */
-  /* normal text */
+    /* normal text */
   set text(
     font: font-text-face,
     size: font-text-size,
@@ -533,11 +606,30 @@
     size: font-math-size,
   )
   /* link text */
-  show link: set text(
-    font: font-mono-face,
-    size: font-mono-size,
-  )
-  /* code text */
+  show link: it => {
+    underline(
+      evade: true,
+      offset: 2pt,
+      // extent: 2pt,
+      stroke: (
+        thickness: 0.5pt,
+        paint: tcg-color-blue,
+        // paint: tcg-color-black,
+        // paint: tcg-color-orange,
+      ),
+      text(
+        // fill: tcg-color-black,
+        fill: tcg-color-blue,
+      )[#it],
+    )
+  }
+  // show link: set text(
+  //   fill: tcg-color-light-blue,
+  //   underline()
+  //   // font: font-mono-face,
+  //   // size: font-mono-size,
+  // )
+  // /* code text */
   show raw: set text(
     font: font-mono-face,
     ligatures: false,
@@ -590,7 +682,9 @@
   }
 
   /* headings */
-  set heading(numbering: "1.1")
+
+  set heading(numbering: if (has-appendix) { "1.1." } else { "1.1" })
+
   show heading: it => block(
     above: 2.5em - it.level * 0.2em,
     below: 1.3em,
@@ -609,14 +703,13 @@
   /* page numbering */
   set page(numbering: "1")
 
-
   // Outline Table of Content/Figures/Tables/etc.
-  show outline.entry.where(level: 1): set block(above: 1.2em)
-  show outline.entry.where(level: 1): set text(size: 1.2em, font: font-head-face, weight: "bold")
-  show outline.entry.where(level: 1): it => {
-    show repeat: none
-    it
-  }
+  // show outline.entry.where(level: 1): set block(above: 1.2em)
+  // show outline.entry.where(level: 1): set text(size: 1.2em, font: font-head-face, weight: "bold")
+  // show outline.entry.where(level: 1): it => {
+  //   show repeat: none
+  //   it
+  // }
   // show outline.entry: it => link(
   //   it.element.location(),
   //   it.indented(it.prefix(), it.inner()),
@@ -637,9 +730,13 @@
     stroke: 1pt,
   )
 
-  show figure.where(kind: table): set figure.caption(position: bottom)
+  /* make figure blocks, especially code/raw and table block, break/span across pages */
+  show figure: set block(breakable: true)
 
+  /* caption positions */
+  show figure.where(kind: table): set figure.caption(position: bottom)
   show figure.where(kind: image): set figure.caption(position: bottom)
+  show figure.where(kind: raw): set figure.caption(position: top) // code
 
   //
   // Title page
@@ -708,7 +805,8 @@
   text(16pt, date, font: font-head-face, weight: "light")
   v(-4pt)
   // text(12pt, "Contact: " + link("mailto:admin@trustedcomputinggroup.org"), font: font-head-face, weight: "extralight")
-  text(12pt, "Contact: " + link("mailto:admin@trustedcomputinggroup.org"), font: font-head-face, weight: "light")
+  // text(12pt, "Contact: " + link("mailto:admin@trustedcomputinggroup.org")[#text(font: font-head-face)[admin\@trustedcomputinggroup.org]], font: font-head-face, weight: "light")
+  text(12pt, font: font-head-face, weight: "light")[Contact: #link("mailto:admin@trustedcomputinggroup.org")]
 
   //
   // Front matter
