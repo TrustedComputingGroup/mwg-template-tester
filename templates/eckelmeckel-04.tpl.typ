@@ -51,7 +51,7 @@
 #let tcg-color-light-green = rgb("#8dc73fff")
 
 /* footer */
-#let color-code-fg = tcg-color-black
+#let color-code-footer = tcg-color-black.lighten(30%)
 
 /* element colors */
 #let color-code-fg = tcg-color-black
