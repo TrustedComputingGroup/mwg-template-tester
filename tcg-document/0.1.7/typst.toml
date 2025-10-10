@@ -1,0 +1,38 @@
+[package]
+name = "tcg-document"
+version = "0.1.7"
+compiler = "0.13.1"
+entrypoint = "lib.typ"
+repository = "https://github.com/TrustedComputingGroup/typst-tcg-document/"
+authors = [
+    "Trusted Computing Group <https://trustedcomputinggroup.org/>",
+    "Chris Fenner <cfenn@google.com>",
+    "Dennis Mattoon <dennisma@microsoft.com>",
+    "Michael Eckel <michael.eckel@sit.fraunhofer.de>",
+]
+license = "MIT-0"
+description = "A Typst template for TCG documents, including specification, reference, and guidance documents"
+keywords = [
+    "Trusted Computing Group",
+    "TCG",
+    "Standardization",
+    "Trusted Computing",
+    "Security",
+    "Computer Science",
+    "Computer Engineering",
+    "Trusted Platform Module",
+    "TPM",
+]
+categories = [
+    "report",
+] # allowed categories (one or many): ["components","visualization","model","layout","text","languages","scripting","integration","utility","fun","book","report","paper","thesis","poster","flyer","presentation","cv","office"]
+disciplines = [
+    "computer-science",
+    "engineering",
+    "communication",
+] # allowed disciplines (one or many): ["agriculture","anthropology","archaeology","architecture","biology","business","chemistry","communication","computer-science","design","drawing","economics","education","engineering","fashion","film","geography","geology","history","journalism","law","linguistics","literature","mathematics","medicine","music","painting","philosophy","photography","physics","politics","psychology","sociology","theater","theology","transportation"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
