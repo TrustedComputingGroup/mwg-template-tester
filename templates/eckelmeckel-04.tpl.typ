@@ -12,15 +12,20 @@
 
 /* --- fonts ---------------------------------------------------------------- */
 
-#let font-head-face = "Signika"
+#let font-head-face = "Inter"
+// #let font-head-face = "Signika"
 // #let font-head-face = "Alegreya Sans"
 #let font-head-size = 24pt
 #let font-text-face = "Literata"
+// #let font-text-face = "Alegreya Sans"
+// #let font-text-face = "Manuale"
 // #let font-text-face = "Gentium Book"
 // #let font-text-face = "Libre Baskerville"
 // #let font-text-face = "Yrsa"
 #let font-text-size = 10.5pt
-#let font-mono-face = "Fira Code"
+// #let font-text-size = 12.0pt
+// #let font-mono-face = "Fira Code"
+#let font-mono-face = "Fira Mono"
 #let font-mono-size = (font-text-size * 0.95)
 // #let font-mono-size = (font-text-size * 1.0)
 // #let font-mono-size = (font-text-size * 0.89)
@@ -44,6 +49,9 @@
 #let tcg-color-blue = rgb("#283578ff")
 #let tcg-color-light-blue = rgb("#3e75c4ff")
 #let tcg-color-light-green = rgb("#8dc73fff")
+
+/* footer */
+#let color-code-fg = tcg-color-black
 
 /* element colors */
 #let color-code-fg = tcg-color-black
@@ -595,7 +603,7 @@
   doc,
 ) = context {
   /* --- font settings ------------------------------------------------------ */
-    /* normal text */
+  /* normal text */
   set text(
     font: font-text-face,
     size: font-text-size,
@@ -651,8 +659,9 @@
     set text(font: font-mono-face, size: font-mono-size * 0.89, fill: rgb(color-code-fg))
     set block(
       fill: rgb(color-code-bg),
+      stroke: (thickness: 0.5pt, paint: tcg-color-gray),
       inset: 1em,
-      radius: 0.5em,
+      // radius: 0.5em,
     )
     it
   }
@@ -812,13 +821,29 @@
   // Front matter
   //
   let foot = (
-    line(length: 100%, stroke: 0.5pt)
+    line(
+      length: 100%,
+      stroke: (
+        thickness: 0.5pt,
+        paint: tcg-color-black.lighten(30%),
+      ),
+    )
       + grid(
         align: (left, center, right),
         columns: (1in, 5.5in, 1in),
         rows: 0.5in,
-        text(sym.copyright + " " + year + " TCG", font: font-head-face, weight: "light"),
-        text(title + if subtitle != none { [ -- ] + subtitle }, font: font-head-face, weight: "light"),
+        text(
+          sym.copyright + " " + year + " TCG",
+          font: font-head-face,
+          weight: "light",
+          fill: tcg-color-black.lighten(30%),
+        ),
+        text(
+          title + if subtitle != none { [ -- ] + subtitle },
+          font: font-head-face,
+          weight: "light",
+          fill: tcg-color-black.lighten(30%),
+        ),
         text(
           context counter(page).display(
             "1",
@@ -826,6 +851,7 @@
           ),
           font: font-head-face,
           weight: "light",
+          fill: tcg-color-black.lighten(30%),
         ),
       )
   )

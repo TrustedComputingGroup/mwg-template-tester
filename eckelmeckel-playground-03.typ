@@ -49,6 +49,12 @@ In cases where the context does not provide sufficient clarity, the following ru
   [Reach out to #link("mailto:admin@trustedcomputinggroup.org") with any questions about this document.],
 )
 
+= TODO
+
++ Fira Mono
++ "Code style" for informative text
++ Pull request
+
 #pagebreak()
 
 
@@ -865,7 +871,9 @@ Intro text.
 
 Intro text.
 
-#informative-eckelmeckel-03([This text fits into a single line.])
+#informative-eckelmeckel-03([
+  #rect(fill: tcg-color-shade, width: 100%)[This text fits into a single line.]
+])
 
 #informative-eckelmeckel-03([
   This text fits into multiple lines.
@@ -1258,7 +1266,8 @@ Code is taken from #link("https://github.com/tpm2-software/tpm2-tss/blob/master/
   row-gutter: 0.5em,
   sorted: "up",
   outlined: true,
-  title: "Abbreviations",
+  title: "Acronyms",
+  // title: "Abbreviations",
 )
 
 
